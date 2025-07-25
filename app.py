@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, send_file, flash, send_from_directory
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_mail import Mail, Message
 from werkzeug.security import generate_password_hash, check_password_hash
 from cryptography.fernet import Fernet
@@ -9,8 +9,6 @@ import sqlite3
 import requests
 import pytz
 import random
-import qrcode
-import io
 from datetime import datetime
 
 app = Flask(__name__)
@@ -74,7 +72,7 @@ def update_last_login(email):
 # ✅ Google Script Logging
 def send_to_google_script(email, status):
     try:
-        url = "https://script.google.com/macros/s/AKfycbye0Ky4KMKw1O3oQj3ctxqpDPyIZu8PyEn8mt7pQOUiLkqvSZ4OUi-oshm2XEUs8PdMjw/exec"
+        url = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec"
         login_time = session.get('login_time') or datetime.now(pytz.timezone("Asia/Kolkata"))
         requests.post(url, json={
             "email": email,
@@ -84,17 +82,59 @@ def send_to_google_script(email, status):
     except Exception as e:
         print("Google logging failed:", e)
 
-# ✅ OTP Email Sender
+
+    # ✅ OTP Email Sender
 def send_otp(email):
     session.pop('otp', None)
     session.pop('otp_time', None)
-    otp = str(random.randint(1000, 9999))
-    session.update({'otp': otp, 'otp_time': time.time(), 'email': email, 'otp_attempts': 0})
 
-    msg = Message(subject=f"🔐 Your OTP for JAIMIN's Login",
-                  recipients=[email])
-    msg.html = f"""<h2>Your OTP is: <strong>{otp}</strong></h2><p>Valid for 5 minutes</p>"""
+    otp = str(random.randint(1000, 9999))
+    session.update({
+        'otp': otp,
+        'otp_time': time.time(),
+        'email': email,
+        'otp_attempts': 0
+    })
+
+    time_now = datetime.now(pytz.timezone("Asia/Kolkata")).strftime("%d %B %Y, %I:%M %p")
+    subject = f"🔐 Your OTP for JAIMIN's Login – {time_now}"
+
+    msg = Message(
+        subject=subject,
+        recipients=[email],
+        reply_to="jaiminparmar024@gmail.com",
+        extra_headers={"X-Priority": "1", "X-MSMail-Priority": "High"}
+    )
+
+    msg.body = f"Your OTP is: {otp}"
+
+    msg.html = f"""<!DOCTYPE html>
+    <html><head><style>
+    body {{ font-family: 'Segoe UI'; background: #f4f4f4; margin: 0; padding: 0; }}
+    .container {{
+      background: #fff; padding: 30px; max-width: 600px; margin: 30px auto;
+      border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }}
+    .otp-box {{
+      font-size: 26px; letter-spacing: 8px; background: #222; color: #fff;
+      padding: 15px; border-radius: 10px; text-align: center; margin: 20px 0;
+    }}
+    .footer {{ font-size: 13px; color: #888; text-align: center; margin-top: 30px; }}
+    </style></head>
+    <body>
+    <div class="container">
+      <h2 style="color:#20B2AA;">🔐 JAIMIN PARMAR's Login OTP</h2>
+      <p>Hello,</p>
+      <p>We received a login request for: <b>{email}</b></p>
+      <p>Enter this OTP to continue:</p>
+      <div class="otp-box">{otp}</div>
+      <p>This OTP is valid for 5 minutes.</p>
+      <p>If you didn’t request this, you can safely ignore this email.</p>
+      <div class="footer">Securely sent by JAIMIN 🚀</div>
+    </div></body></html>"""
+
     mail.send(msg)
+
 
 # ✅ Maintenance Mode
 @app.before_request
@@ -138,7 +178,7 @@ def login():
 @app.route('/verify', methods=['GET', 'POST'])
 def verify():
     if request.method == 'POST':
-        otp_input = request.form.get('otp')
+        otp_input = request.form.get('otp', '').strip()
         if not session.get('otp') or time.time() - session.get('otp_time', 0) > 300:
             return render_template('verify.html', error="OTP expired.")
 
@@ -246,7 +286,6 @@ def delete():
 
     return redirect('/dashboard')
 
-# ✅ Proper Logout Route
 @app.route('/logout')
 def logout():
     email = session.get('email')
@@ -254,3 +293,6 @@ def logout():
     if email:
         send_to_google_script(email, "Logout")
     return redirect(url_for('login'))
+
+if __name__ == '__main__':
+    app.run(debug=True)
