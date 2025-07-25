@@ -1,85 +1,310 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-  <title>Login</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>🔐 JAIMIN PARMAR | Dream Website</title>
+
+  <!-- ✅ Favicon -->
+  <link rel="icon" href="https://jaiminparmar.onrender.com/static/logo512.jpg" type="image/jpeg" sizes="512x512" />
+
+  <!-- ✅ SEO Meta -->
+  <meta name="description" content="JAIMIN PARMAR's Dream Website – a secure OTP login portal with smart tools." />
+  <meta name="keywords" content="OTP login, secure, email authentication, flask, jaimin parmar, jaimin parmar dream website , dreamsite, jaimin parmar dreamsite" />
+  <meta name="author" content="Jaimin Parmar" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://jaiminparmar.onrender.com/" />
+
+  <!-- ✅ Open Graph (Facebook, WhatsApp) -->
+  <meta property="og:title" content="🔐 JAIMIN PARMAR | Dream Website" />
+  <meta property="og:description" content="Secure OTP login portal with Password Manager and more tools." />
+  <meta property="og:image" content="https://jaiminparmar.onrender.com/static/logo512.jpg" />
+  <meta property="og:image:type" content="image/jpeg" />
+  <meta property="og:image:width" content="512" />
+  <meta property="og:image:height" content="512" />
+  <meta property="og:url" content="https://jaiminparmar.onrender.com/" />
+  <meta property="og:type" content="website" />
+
+  <!-- ✅ Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="JAIMIN PARMAR | Dream Website" />
+  <meta name="twitter:description" content="Explore JAIMIN's Dream Website – secure login, smart tools, OTP system." />
+  <meta name="twitter:image" content="https://jaiminparmar.onrender.com/static/logo512.jpg" />
+
+  <!-- ✅ Search Engine Verification -->
+  <meta name="google-site-verification" content="5Q2w2DNziS6aGw83dWomTOjfuIDMzY26NkFmeCWxjFA" />
+  <meta name="msvalidate.01" content="5415B08FCC9D95909C98A1DBD05C2AC2" />
+
+  <!-- ✅ Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0"></script>
+
+  <!-- ✅ Style -->
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background: #0f2027;  /* fallback for old browsers */
-      background: linear-gradient(to right, #2c5364, #203a43, #0f2027);
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(115deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.9)),
+        url('https://images.unsplash.com/photo-1612831455540-1f0e3a1fcac4') no-repeat center center/cover;
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 100vh;
-      margin: 0;
-      color: white;
+      overflow: hidden;
     }
-    .container {
-      background-color: rgba(0,0,0,0.6);
-      padding: 30px 40px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(255,255,255,0.1);
-      width: 300px;
+
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      padding: 2rem;
+      border-radius: 20px;
       text-align: center;
-    }
-    h2 {
-      margin-bottom: 20px;
-    }
-    input[type="email"],
-    input[type="password"] {
+      color: #fff;
+      animation: fadeIn 1s ease forwards;
       width: 90%;
-      padding: 10px;
-      margin: 10px 0;
-      border: none;
-      border-radius: 5px;
+      max-width: 350px;
     }
-    button {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 5px;
-      background: #1abc9c;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
+
+    .profile-pic {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #fff;
+      margin-bottom: 1rem;
+      animation: bounceIn 1s ease;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+      color: #00ffc3;
+      text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
+    }
+
+    .summary {
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+      opacity: 0.85;
+    }
+
+    input[type="email"] {
+      padding: 10px;
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      margin-bottom: 1rem;
+      outline: none;
       transition: 0.3s;
     }
+
+    input:focus {
+      border: 2px solid #00ffc3;
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    input::placeholder {
+      color: #ccc;
+    }
+
+    button {
+      padding: 10px;
+      width: 100%;
+      border: none;
+      border-radius: 8px;
+      background-color: #00ffc3;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
     button:hover {
-      background: #16a085;
+      background-color: #00cc99;
     }
-    p {
-      margin-top: 15px;
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid #fff;
+      border-top: 2px solid transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+      margin-right: 6px;
+      vertical-align: middle;
     }
-    a {
-      color: #1abc9c;
-      text-decoration: none;
+
+    .footer {
+      margin-top: 1.3rem;
+      font-size: 0.75rem;
+      opacity: 0.75;
+      line-height: 1.5;
     }
-    a:hover {
-      text-decoration: underline;
+
+    #typed-text {
+      color: #00ffc3;
+      font-weight: bold;
+      font-size: 1.4rem;
     }
-    .error {
-      background-color: #e74c3c;
-      color: white;
-      padding: 8px;
-      margin-top: 15px;
-      border-radius: 5px;
-      font-size: 14px;
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes bounceIn {
+      0% {
+        transform: scale(0.5);
+        opacity: 0;
+      }
+
+      80% {
+        transform: scale(1.05);
+        opacity: 1;
+      }
+
+      100% {
+        transform: scale(1);
+      }
     }
   </style>
 </head>
+
 <body>
-  <div class="container">
-    <h2>Login</h2>
-    <form method="POST">
-      <input type="email" name="email" placeholder="Email" required><br>
-      <input type="password" name="password" placeholder="Password" required><br>
-      <button type="submit">Login</button>
+  <main class="card">
+    <img src="https://i.postimg.cc/2SQYWvJm/cropped-circle-imag.jpg" alt="Profile Photo" class="profile-pic" />
+
+    <h1><span id="typed-text"></span></h1>
+
+    <div class="summary">
+      Welcome to our login page.<br />
+      <strong>Designed by JAIMIN</strong>
+    </div>
+
+    <form method="POST" action="/">
+      <input type="email" id="email" name="email" placeholder="Enter your email" required />
+      <button type="submit" id="submitBtn">
+        <span class="spinner" style="display:none;"></span> 🔐 Send OTP
+      </button>
     </form>
-    <p>Don't have an account? <a href="/register">Register</a></p>
-    {% with messages = get_flashed_messages() %}
-      {% for msg in messages %}
-        <p class="error">{{ msg }}</p>
-      {% endfor %}
-    {% endwith %}
-  </div>
+
+    <div class="footer">
+      🚀 Privacy focused • One-click email OTP login • No password risk
+    </div>
+  </main>
+
+  <!-- ✅ Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "name": "Jaimin Parmar",
+        "url": "https://jaiminparmar.onrender.com/",
+        "author": {
+          "@type": "Person",
+          "name": "Jaimin Parmar"
+        },
+        "description": "Portfolio and tool website of Jaimin Parmar with developer utilities like Secure OTP login, Dreamsite, QR Code Generator."
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://jaiminparmar.onrender.com/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "QR Generator",
+            "item": "https://jaiminparmar.onrender.com/generate_qr"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Password Manager",
+            "item": "https://jaiminparmar.onrender.com/password-manager"
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <!-- ✅ Typed Text, Spinner, Confetti -->
+  <script>
+    new Typed('#typed-text', {
+      strings: ["JAIMIN PARMAR's Login"],
+      typeSpeed: 45,
+      backSpeed: 0,
+      loop: false,
+      showCursor: false
+    });
+
+    const form = document.querySelector("form");
+    const button = document.getElementById("submitBtn");
+    const spinner = document.querySelector(".spinner");
+
+    form.addEventListener("submit", () => {
+      button.disabled = true;
+      spinner.style.display = "inline-block";
+    });
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('sent') === 'true') {
+      alert("✅ OTP has been sent to your email!");
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    }
+
+    document.addEventListener('contextmenu', e => e.preventDefault());
+
+    const emailInput = document.getElementById("email");
+    emailInput.addEventListener("input", () => {
+      const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value);
+      emailInput.style.borderColor = valid ? "#00ffc3" : "#ccc";
+    });
+  </script>
+
+  <!-- ✅ Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-3TKXF0GDQE"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-3TKXF0GDQE');
+  </script>
 </body>
 </html>

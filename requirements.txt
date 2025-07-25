@@ -1,4 +1,1 @@
-Flask
-cryptography
-werkzeug
-gunicorn
+FlaskFlask-MailpytzrequestsgunicornqrcodePillowcryptographywerkzeug
