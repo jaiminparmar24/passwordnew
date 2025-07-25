@@ -40,11 +40,6 @@
       border: none;
       border-radius: 6px;
       cursor: pointer;
-      transition: background 0.3s ease;
-    }
-
-    button:hover {
-      background-color: #0c5ace;
     }
 
     .logout {
@@ -66,37 +61,19 @@
       text-align: left;
     }
 
-    .action-buttons {
-      display: flex;
-      gap: 10px;
+    .delete-btn {
+      padding: 6px 10px;
+      font-size: 12px;
+      border: none;
+      border-radius: 4px;
+      background-color: #ea4335;
+      color: white;
+      cursor: pointer;
     }
 
     .search-box {
       margin-top: 20px;
       margin-bottom: 10px;
-    }
-
-    .copy-btn, .delete-btn, .show-btn {
-      padding: 6px 10px;
-      font-size: 12px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    .copy-btn {
-      background-color: #34a853;
-      color: white;
-    }
-
-    .delete-btn {
-      background-color: #ea4335;
-      color: white;
-    }
-
-    .show-btn {
-      background-color: #fbbc04;
-      color: black;
     }
 
     .success {
@@ -131,26 +108,17 @@
       <thead>
         <tr>
           <th>Website</th>
-          <th>Email</th>
+          <th>Email/Username</th>
           <th>Password</th>
-          <th>Actions</th>
+          <th>Action</th>
         </tr>
       </thead>
       <tbody>
         {% for entry in saved_data %}
         <tr>
           <td>{{ entry[0] }}</td>
-          <td>
-            {{ entry[1] }}
-            <button class="copy-btn" onclick="copyText('{{ entry[1] }}')">Copy</button>
-          </td>
-         <td>
-  <span id="pwd-{{ loop.index }}">{{ entry[2] }}</span>
-  <div class="action-buttons">
-    <button class="show-btn" onclick="toggleVisibility('pwd-{{ loop.index }}', '{{ entry[2] }}')">Show</button>
-  </div>
-</td>
-
+          <td>{{ entry[1] }}</td>
+          <td>{{ entry[2] }}</td>
           <td>
             <form method="POST" action="/delete" style="display:inline;">
               <input type="hidden" name="website" value="{{ entry[0] }}">
@@ -168,21 +136,6 @@
   </div>
 
   <script>
-    function copyText(text) {
-      navigator.clipboard.writeText(text).then(() => {
-        alert("Copied to clipboard!");
-      });
-    }
-
-    function toggleVisibility(id, actualPassword) {
-      const elem = document.getElementById(id);
-      if (elem.textContent === "••••••••") {
-        elem.textContent = actualPassword;
-      } else {
-        elem.textContent = "••••••••";
-      }
-    }
-
     function searchTable() {
       const input = document.getElementById("searchInput");
       const filter = input.value.toLowerCase();
@@ -193,15 +146,6 @@
         row.style.display = website.includes(filter) || email.includes(filter) ? "" : "none";
       });
     }
-
-    // Obfuscate passwords by default
-    window.onload = () => {
-      const rows = document.querySelectorAll("#credTable tbody tr");
-      rows.forEach((row, index) => {
-        const pwdCell = document.getElementById(`pwd-${index + 1}`);
-        if (pwdCell) pwdCell.textContent = "••••••••";
-      });
-    };
   </script>
 </body>
 </html>
