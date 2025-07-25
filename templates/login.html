@@ -6,40 +6,27 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>🔐 JAIMIN PARMAR | Password Manager</title>
 
-  <!-- ✅ Favicon -->
   <link rel="icon" href="https://jaiminparmar.onrender.com/static/logo512.jpg" type="image/jpeg" sizes="512x512" />
-
-  <!-- ✅ SEO Meta -->
-  <meta name="description" content="JAIMIN PARMAR's Password Manager – a secure email OTP login portal with encrypted password storage." />
-  <meta name="keywords" content="Password manager, OTP login, secure, encryption, email authentication, flask, jaimin parmar, jaimin parmar password manager" />
+  <meta name="description" content="Login to Jaimin Parmar's encrypted password manager using a secure email-based OTP." />
+  <meta name="keywords" content="secure login, password manager, OTP, encryption, Jaimin Parmar" />
   <meta name="author" content="Jaimin Parmar" />
   <meta name="robots" content="index, follow" />
-  <link rel="canonical" href="https://jaiminparmar.onrender.com/password-manager" />
 
-  <!-- ✅ Open Graph (Facebook, WhatsApp) -->
-  <meta property="og:title" content="🔐 JAIMIN PARMAR | Password Manager" />
-  <meta property="og:description" content="Secure email OTP login with personal encrypted password vault by Jaimin Parmar." />
+  <meta property="og:title" content="🔐 JAIMIN PARMAR | Login" />
+  <meta property="og:description" content="Secure login portal with email OTP verification." />
   <meta property="og:image" content="https://jaiminparmar.onrender.com/static/logo512.jpg" />
-  <meta property="og:image:type" content="image/jpeg" />
-  <meta property="og:image:width" content="512" />
-  <meta property="og:image:height" content="512" />
   <meta property="og:url" content="https://jaiminparmar.onrender.com/password-manager" />
   <meta property="og:type" content="website" />
-
-  <!-- ✅ Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="JAIMIN PARMAR | Password Manager" />
-  <meta name="twitter:description" content="Jaimin Parmar's secure password manager with OTP login system." />
+  <meta name="twitter:title" content="JAIMIN PARMAR | Login" />
+  <meta name="twitter:description" content="Login securely to Jaimin Parmar's password manager." />
   <meta name="twitter:image" content="https://jaiminparmar.onrender.com/static/logo512.jpg" />
 
-  <!-- ✅ Search Engine Verification -->
-  <meta name="google-site-verification" content="5Q2w2DNziS6aGw83dWomTOjfuIDMzY26NkFmeCWxjFA" />
-  <meta name="msvalidate.01" content="5415B08FCC9D95909C98A1DBD05C2AC2" />
-
-  <!-- ✅ Libraries -->
+  <meta name="google-site-verification" content="7n0kngPgFdHRGsuXlhQe1mHTzJtFLm_TvGMMbxEydps" />
   <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0"></script>
-<style>
+
+  <style>
     * {
       margin: 0;
       padding: 0;
@@ -190,8 +177,6 @@
       }
     }
   </style>
-
-<meta name="google-site-verification" content="7n0kngPgFdHRGsuXlhQe1mHTzJtFLm_TvGMMbxEydps" />
 </head>
 
 <body>
@@ -203,19 +188,25 @@
       <strong>Designed by JAIMIN</strong>
     </div>
 
-    <form method="POST" action="/">
-      <input type="email" id="email" name="email" placeholder="Enter your email" required />
+    <!-- ✅ Fixed: Use /login, not / -->
+    <form method="POST" action="/login">
+      <label for="email" style="display: none;">Email</label>
+      <input type="email" id="email" name="email" placeholder="Enter your email" aria-label="Email" required />
       <button type="submit" id="submitBtn">
         <span class="spinner" style="display:none;"></span> 🔐 Send OTP
       </button>
     </form>
+
+    <!-- ✅ Error Flash (from Flask context) -->
+    {% if error %}
+      <div style="color: #ff8080; font-size: 0.85rem; margin-top: 0.5rem;">⚠️ {{ error }}</div>
+    {% endif %}
 
     <div class="footer">
       🔐 Encrypted & Secure • Email-based OTP Login • No Password Leaks
     </div>
   </main>
 
-  <!-- ✅ Structured Schema -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -251,7 +242,6 @@
   }
   </script>
 
-  <!-- ✅ Scripts -->
   <script>
     new Typed('#typed-text', {
       strings: ["JAIMIN PARMAR Password Manager"],
@@ -280,12 +270,12 @@
 
     const emailInput = document.getElementById("email");
     emailInput.addEventListener("input", () => {
-      const valid = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(emailInput.value);
+      const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value);
       emailInput.style.borderColor = valid ? "#00ffc3" : "#ccc";
     });
   </script>
 
-  <!-- ✅ Analytics -->
+  <!-- ✅ Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-3TKXF0GDQE"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
