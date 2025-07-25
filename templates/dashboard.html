@@ -116,14 +116,14 @@
       <tbody>
         {% for entry in saved_data %}
         <tr>
-          <td>{{ entry[0] }}</td>
-          <td>{{ entry[1] }}</td>
-          <td>{{ entry[2] }}</td>
+          <td>{{ entry.website }}</td>
+          <td>{{ entry.email }}</td>
+          <td>{{ entry.password }}</td>
           <td>
             <form method="POST" action="/delete" style="display:inline;">
-              <input type="hidden" name="website" value="{{ entry[0] }}">
-              <input type="hidden" name="login_email" value="{{ entry[1] }}">
-              <input type="hidden" name="saved_password" value="{{ entry[2] }}">
+              <input type="hidden" name="website" value="{{ entry.website }}">
+              <input type="hidden" name="login_email" value="{{ entry.email }}">
+              <input type="hidden" name="saved_password" value="{{ entry.password }}">
               <button class="delete-btn" type="submit">Delete</button>
             </form>
           </td>
