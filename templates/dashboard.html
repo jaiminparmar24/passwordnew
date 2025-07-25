@@ -144,13 +144,13 @@
             {{ entry[1] }}
             <button class="copy-btn" onclick="copyText('{{ entry[1] }}')">Copy</button>
           </td>
-          <td>
-            <span id="pwd-{{ loop.index }}">{{ entry[2] }}</span>
-            <div class="action-buttons">
-              <button class="copy-btn" onclick="copyText('{{ entry[2] }}')">Copy</button>
-              <button class="show-btn" onclick="toggleVisibility('pwd-{{ loop.index }}', '{{ entry[2] }}')">Show</button>
-            </div>
-          </td>
+         <td>
+  <span id="pwd-{{ loop.index }}">{{ entry[2] }}</span>
+  <div class="action-buttons">
+    <button class="show-btn" onclick="toggleVisibility('pwd-{{ loop.index }}', '{{ entry[2] }}')">Show</button>
+  </div>
+</td>
+
           <td>
             <form method="POST" action="/delete" style="display:inline;">
               <input type="hidden" name="website" value="{{ entry[0] }}">
