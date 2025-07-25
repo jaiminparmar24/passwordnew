@@ -74,7 +74,7 @@ def update_last_login(email):
 # ✅ Google Script Logging
 def send_to_google_script(email, status):
     try:
-        url = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec"
+        url = "https://script.google.com/macros/s/AKfycbye0Ky4KMKw1O3oQj3ctxqpDPyIZu8PyEn8mt7pQOUiLkqvSZ4OUi-oshm2XEUs8PdMjw/exec"
         login_time = session.get('login_time') or datetime.now(pytz.timezone("Asia/Kolkata"))
         requests.post(url, json={
             "email": email,
