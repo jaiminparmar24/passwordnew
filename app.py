@@ -114,8 +114,11 @@ def login():
 
     if request.method == 'POST':
         email = request.form.get('email', '').strip()
+
         if not email:
-            return render_template('login.html', error="Enter your email.")
+            flash("Enter your email.", "error")
+            return render_template('login.html')
+
         session['email'] = email
 
         with sqlite3.connect("database.db") as conn:
@@ -127,9 +130,11 @@ def login():
                 conn.commit()
 
         send_otp(email)
+        flash("OTP sent to your email.", "info")
         return redirect('/verify')
 
     return render_template('login.html')
+
 
 @app.route('/verify', methods=['GET', 'POST'])
 def verify():
