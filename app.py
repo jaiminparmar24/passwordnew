@@ -135,7 +135,6 @@ def login():
 
     return render_template('login.html')
 
-
 @app.route('/verify', methods=['GET', 'POST'])
 def verify():
     if request.method == 'POST':
@@ -154,8 +153,6 @@ def verify():
             return render_template('verify.html', error="Wrong OTP.")
 
     return render_template('verify.html')
-
-# (Same imports and setup as before...)
 
 @app.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
@@ -248,3 +245,12 @@ def delete():
             flash("Credential not found or password mismatch.")
 
     return redirect('/dashboard')
+
+# ✅ Proper Logout Route
+@app.route('/logout')
+def logout():
+    email = session.get('email')
+    session.clear()
+    if email:
+        send_to_google_script(email, "Logout")
+    return redirect(url_for('login'))
