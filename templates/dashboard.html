@@ -1,33 +1,81 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Dashboard</title>
   <link rel="stylesheet" href="/static/style.css">
+  <script>
+    // Copy password/email to clipboard
+    function copyToClipboard(id) {
+      const text = document.getElementById(id).innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        alert("Copied: " + text);
+      });
+    }
+
+    // Filter table rows based on search input
+    function filterTable() {
+      const query = document.getElementById("search").value.toLowerCase();
+      const rows = document.querySelectorAll("table tbody tr");
+
+      rows.forEach(row => {
+        const cells = row.querySelectorAll("td");
+        const match = [...cells].some(td => td.innerText.toLowerCase().includes(query));
+        row.style.display = match ? "" : "none";
+      });
+    }
+  </script>
 </head>
 <body>
   <div class="container">
     <h2>Your Passwords</h2>
+
     <form method="POST">
       <input type="text" name="website" placeholder="Website" required><br>
       <input type="text" name="email" placeholder="Email/Username" required><br>
       <input type="text" name="password" placeholder="Password" required><br>
       <button type="submit">Save</button>
     </form>
+
     {% with messages = get_flashed_messages() %}
-      {% for msg in messages %}<p class="success">{{ msg }}</p>{% endfor %}
+      {% for msg in messages %}
+        <p class="success">{{ msg }}</p>
+      {% endfor %}
     {% endwith %}
 
     <h3>Stored Credentials</h3>
+
+    <input type="text" id="search" onkeyup="filterTable()" placeholder="Search by website/email..." class="search-box">
+
     <table>
-      <tr><th>Website</th><th>Email</th><th>Password</th></tr>
-      {% for website, email, password in entries %}
-      <tr>
-        <td>{{ website }}</td>
-        <td>{{ email }}</td>
-        <td>{{ password }}</td>
-      </tr>
-      {% endfor %}
+      <thead>
+        <tr>
+          <th>Website</th>
+          <th>Email</th>
+          <th>Password</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for website, email, password in entries %}
+        <tr>
+          <td id="website-{{ loop.index }}">{{ website }}</td>
+          <td id="email-{{ loop.index }}">{{ email }}</td>
+          <td id="password-{{ loop.index }}">{{ password }}</td>
+          <td>
+            <button onclick="copyToClipboard('email-{{ loop.index }}')">📋 Email</button>
+            <button onclick="copyToClipboard('password-{{ loop.index }}')">🔐 Password</button>
+            <form method="POST" action="/delete" style="display:inline;">
+              <input type="hidden" name="website" value="{{ website }}">
+              <input type="hidden" name="email" value="{{ email }}">
+              <button type="submit" class="delete-btn">🗑 Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
     </table>
+
     <a href="/logout" class="logout">Logout</a>
   </div>
 </body>
