@@ -211,6 +211,7 @@ def dashboard():
 
         user_id = user_row[0]
 
+        # ✅ Handle form submission
         if request.method == 'POST':
             website = request.form.get('website')
             login_email = request.form.get('login_email')
@@ -221,10 +222,14 @@ def dashboard():
                 c.execute("INSERT INTO passwords (user_id, website, login_email, saved_password) VALUES (?, ?, ?, ?)",
                           (user_id, website, login_email, encrypted))
                 conn.commit()
-                flash("Credential Saved")
+                flash("Credential Saved", "success")
             else:
-                flash("All fields required")
+                flash("All fields required", "error")
 
+            # ✅ Redirect after POST to prevent re-submission on refresh
+            return redirect(url_for('dashboard'))
+
+        # ✅ Continue with GET
         c.execute("SELECT id, website, login_email, saved_password FROM passwords WHERE user_id=?", (user_id,))
         rows = c.fetchall()
         saved_data = []
@@ -242,6 +247,7 @@ def dashboard():
 
     last_login = get_last_login(email)
     return render_template('dashboard.html', saved_data=saved_data, email=email, last_login=last_login)
+
 
 @app.route('/delete', methods=['POST'])
 def delete():
