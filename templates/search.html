@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Search Password</title>
+</head>
+<body>
+  <h2>Search Stored Password</h2>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <p style="color: {{ 'red' if category == 'error' else 'green' }}">{{ message }}</p>
+    {% endfor %}
+  {% endwith %}
+  <form method="POST">
+    Website: <input type="text" name="website">
+    <button type="submit">Search</button>
+  </form>
+  {% if email %}
+    <p><strong>Website:</strong> {{ website }}</p>
+    <p><strong>Email:</strong> {{ email }}</p>
+    <p><strong>Password:</strong> {{ password }}</p>
+  {% endif %}
+  <br>
+  <a href="/">Back</a>
+</body>
+</html>
