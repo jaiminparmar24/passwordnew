@@ -155,6 +155,8 @@ def verify():
 
     return render_template('verify.html')
 
+# (Same imports and setup as before...)
+
 @app.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
     if not session.get('logged_in'):
@@ -164,7 +166,13 @@ def dashboard():
     with sqlite3.connect('database.db') as conn:
         c = conn.cursor()
         c.execute("SELECT id FROM users WHERE email=?", (email,))
-        user_id = c.fetchone()[0]
+        user_row = c.fetchone()
+
+        if not user_row:
+            flash("User not found.")
+            return redirect('/logout')
+
+        user_id = user_row[0]
 
         if request.method == 'POST':
             website = request.form.get('website')
@@ -180,25 +188,23 @@ def dashboard():
             else:
                 flash("All fields required")
 
-        c.execute("SELECT website, login_email, saved_password FROM passwords WHERE user_id=?", (user_id,))
+        c.execute("SELECT id, website, login_email, saved_password FROM passwords WHERE user_id=?", (user_id,))
         rows = c.fetchall()
         saved_data = []
         for row in rows:
             try:
-                decrypted = fernet.decrypt(row[2].encode()).decode()
+                decrypted = fernet.decrypt(row[3].encode()).decode()
             except:
                 decrypted = "Error"
-            saved_data.append({'website': row[0], 'email': row[1], 'password': decrypted})
+            saved_data.append({
+                'id': row[0],
+                'website': row[1],
+                'email': row[2],
+                'password': decrypted
+            })
 
     last_login = get_last_login(email)
     return render_template('dashboard.html', saved_data=saved_data, email=email, last_login=last_login)
-
-@app.route('/logout')
-def logout():
-    email = session.get('email', 'Unknown')
-    send_to_google_script(email, "Logout")
-    session.clear()
-    return redirect('/login')
 
 @app.route('/delete', methods=['POST'])
 def delete():
@@ -208,54 +214,37 @@ def delete():
     email = session['email']
     website = request.form.get('website')
     login_email = request.form.get('login_email')
-    saved_password = request.form.get('saved_password')
+    password_to_delete = request.form.get('saved_password')
 
-    encrypted = fernet.encrypt(saved_password.encode()).decode()
     with sqlite3.connect('database.db') as conn:
         c = conn.cursor()
-        c.execute("""DELETE FROM passwords 
-                     WHERE user_id=(SELECT id FROM users WHERE email=?) 
-                     AND website=? AND login_email=? AND saved_password=?""",
-                  (email, website, login_email, encrypted))
-        conn.commit()
+        c.execute("SELECT id FROM users WHERE email=?", (email,))
+        user_row = c.fetchone()
 
-    flash("Credential deleted.")
+        if not user_row:
+            flash("User not found.")
+            return redirect('/logout')
+
+        user_id = user_row[0]
+        c.execute("SELECT id, saved_password FROM passwords WHERE user_id=? AND website=? AND login_email=?",
+                  (user_id, website, login_email))
+        rows = c.fetchall()
+
+        deleted = False
+        for row in rows:
+            try:
+                decrypted = fernet.decrypt(row[1].encode()).decode()
+                if decrypted == password_to_delete:
+                    c.execute("DELETE FROM passwords WHERE id=?", (row[0],))
+                    conn.commit()
+                    deleted = True
+                    break
+            except:
+                continue
+
+        if deleted:
+            flash("Credential deleted.")
+        else:
+            flash("Credential not found or password mismatch.")
+
     return redirect('/dashboard')
-
-@app.route('/resend_otp', methods=['POST'])
-def resend_otp():
-    if 'email' not in session:
-        return "Session expired", 401
-    try:
-        send_otp(session['email'])
-        return "OTP Resent", 200
-    except Exception as e:
-        return f"Failed: {e}", 500
-
-@app.route('/generate_qr', methods=['POST'])
-def generate_qr():
-    url = request.form.get('url')
-    if not url:
-        return "No URL", 400
-
-    qr = qrcode.make(url)
-    buf = io.BytesIO()
-    qr.save(buf)
-    buf.seek(0)
-
-    return send_file(buf, mimetype='image/png')
-
-@app.route('/robots.txt')
-def robots():
-    return send_from_directory("static", "robots.txt")
-
-@app.route('/sitemap.xml')
-def sitemap():
-    return send_from_directory("static", "sitemap.xml")
-
-@app.route('/maintenance')
-def maintenance():
-    return render_template("maintenance.html"), 503
-
-if __name__ == '__main__':
-    app.run(debug=True)
