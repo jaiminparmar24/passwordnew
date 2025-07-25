@@ -196,6 +196,12 @@
 
     <a href="/logout" class="logout">Logout</a>
   </div>
+<script>
+  // ✅ Prevent form resubmission on refresh
+  if (window.history.replaceState) {
+    window.history.replaceState(null, null, window.location.href);
+  }
+</script>
 
   <script>
     function searchTable() {
