@@ -2,9 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Password Manager Dashboard</title>
   <link rel="stylesheet" href="/static/style.css">
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: #f1f3f4;
@@ -13,40 +18,60 @@
     }
 
     .container {
-      max-width: 900px;
-      margin: 40px auto;
+      max-width: 100%;
+      width: 95%;
+      margin: 20px auto;
       background: #fff;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
 
     h2, h3 {
       color: #202124;
+      margin-top: 0;
     }
 
     input[type="text"], input[type="password"] {
       width: 100%;
-      padding: 12px;
+      padding: 14px;
       margin: 10px 0;
       border: 1px solid #ccc;
-      border-radius: 6px;
+      border-radius: 8px;
+      font-size: 16px;
     }
 
     button {
-      padding: 10px 20px;
+      padding: 12px;
+      width: 100%;
       background-color: #1a73e8;
       color: white;
+      font-size: 16px;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
+      margin-top: 10px;
     }
 
     .logout {
-      display: inline-block;
-      margin-top: 20px;
+      display: block;
+      margin-top: 25px;
       color: #d93025;
       text-decoration: none;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .search-box {
+      margin-top: 20px;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
     }
 
     table {
@@ -56,29 +81,66 @@
     }
 
     th, td {
-      padding: 12px;
+      padding: 12px 8px;
       border-bottom: 1px solid #ddd;
       text-align: left;
+      font-size: 14px;
+      word-break: break-word;
     }
 
     .delete-btn {
-      padding: 6px 10px;
-      font-size: 12px;
+      padding: 8px 12px;
+      font-size: 13px;
       border: none;
-      border-radius: 4px;
+      border-radius: 6px;
       background-color: #ea4335;
       color: white;
       cursor: pointer;
     }
 
-    .search-box {
-      margin-top: 20px;
-      margin-bottom: 10px;
-    }
-
     .success {
       color: green;
       font-size: 14px;
+      margin-top: 10px;
+    }
+
+    /* 🔁 Responsive Table */
+    @media screen and (max-width: 600px) {
+      table, thead, tbody, th, td, tr {
+        display: block;
+        width: 100%;
+      }
+
+      thead {
+        display: none;
+      }
+
+      tr {
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 10px;
+        background: #fafafa;
+      }
+
+      td {
+        text-align: right;
+        position: relative;
+        padding-left: 50%;
+      }
+
+      td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 10px;
+        width: 45%;
+        font-weight: bold;
+        text-align: left;
+      }
+
+      button {
+        font-size: 15px;
+      }
     }
   </style>
 </head>
@@ -107,7 +169,7 @@
     <table id="credTable">
       <thead>
         <tr>
-          <th>Website</th>
+          <th>Website/App</th>
           <th>Email/Username</th>
           <th>Password</th>
           <th>Action</th>
@@ -116,10 +178,10 @@
       <tbody>
         {% for entry in saved_data %}
         <tr>
-          <td>{{ entry.website }}</td>
-          <td>{{ entry.email }}</td>
-          <td>{{ entry.password }}</td>
-          <td>
+          <td data-label="Website/App">{{ entry.website }}</td>
+          <td data-label="Email/Username">{{ entry.email }}</td>
+          <td data-label="Password">{{ entry.password }}</td>
+          <td data-label="Action">
             <form method="POST" action="/delete" style="display:inline;">
               <input type="hidden" name="website" value="{{ entry.website }}">
               <input type="hidden" name="login_email" value="{{ entry.email }}">
