@@ -6,13 +6,13 @@ import sqlite3, os
 app = Flask(__name__)
 app.secret_key = "supersecret"
 
-# Create secret key
+# Create encryption key if not exists
 if not os.path.exists("secret.key"):
     with open("secret.key", "wb") as f:
         f.write(Fernet.generate_key())
 fernet = Fernet(open("secret.key", "rb").read())
 
-# DB setup
+# Initialize database
 def init_db():
     with sqlite3.connect("users.db") as conn:
         conn.execute("""CREATE TABLE IF NOT EXISTS users (
@@ -69,6 +69,8 @@ def dashboard():
     if "user_id" not in session:
         return redirect('/login')
 
+    search = request.args.get('search', '').strip()
+
     if request.method == "POST":
         website = request.form['website']
         email = request.form['email']
@@ -80,9 +82,23 @@ def dashboard():
 
     with sqlite3.connect("users.db") as conn:
         cur = conn.cursor()
-        cur.execute("SELECT website, email, password FROM passwords WHERE user_id = ?", (session['user_id'],))
-        entries = [(w, e, fernet.decrypt(p.encode()).decode()) for w, e, p in cur.fetchall()]
-    return render_template("dashboard.html", entries=entries)
+        if search:
+            cur.execute("SELECT id, website, email, password FROM passwords WHERE user_id = ? AND website LIKE ?",
+                        (session['user_id'], f"%{search}%"))
+        else:
+            cur.execute("SELECT id, website, email, password FROM passwords WHERE user_id = ?",
+                        (session['user_id'],))
+        entries = [(i, w, e, fernet.decrypt(p.encode()).decode()) for i, w, e, p in cur.fetchall()]
+    return render_template("dashboard.html", entries=entries, search=search)
+
+@app.route('/delete/<int:entry_id>')
+def delete(entry_id):
+    if "user_id" not in session:
+        return redirect('/login')
+    with sqlite3.connect("users.db") as conn:
+        conn.execute("DELETE FROM passwords WHERE id = ? AND user_id = ?", (entry_id, session['user_id']))
+    flash("Entry deleted.")
+    return redirect('/dashboard')
 
 @app.route('/logout')
 def logout():
