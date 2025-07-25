@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, url_for
+from flask import Flask, render_template, request, redirect, session, url_for, flash
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
 from cryptography.fernet import Fernet
@@ -7,7 +7,7 @@ import os
 app = Flask(__name__)
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'your_default_secret_key')
 
-# Create encryption key file if not exist
+# Create encryption key file if it doesn't exist
 if not os.path.exists("encryption.key"):
     with open("encryption.key", "wb") as key_file:
         key_file.write(Fernet.generate_key())
@@ -16,7 +16,7 @@ with open("encryption.key", "rb") as key_file:
     key = key_file.read()
 fernet = Fernet(key)
 
-# Initialize DB
+# Initialize the database
 def init_db():
     conn = sqlite3.connect('database.db')
     c = conn.cursor()
@@ -52,9 +52,10 @@ def register():
         try:
             c.execute("INSERT INTO users (email, password) VALUES (?, ?)", (email, password))
             conn.commit()
+            flash("Registration successful! Please log in.")
             return redirect('/login')
         except sqlite3.IntegrityError:
-            return "User already exists"
+            flash("User already exists.")
     return render_template('register.html')
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -71,7 +72,7 @@ def login():
             session['email'] = user[1]
             return redirect('/dashboard')
         else:
-            return "Invalid credentials"
+            flash("Invalid email or password.")
     return render_template('login.html')
 
 @app.route('/dashboard', methods=['GET', 'POST'])
@@ -84,22 +85,30 @@ def dashboard():
     c = conn.cursor()
 
     if request.method == 'POST':
-        website = request.form['website']
-        login_email = request.form['login_email']
-        saved_password = request.form['saved_password']
-        encrypted_password = fernet.encrypt(saved_password.encode()).decode()
-        c.execute("INSERT INTO passwords (user_id, website, login_email, saved_password) VALUES (?, ?, ?, ?)",
-                  (user_id, website, login_email, encrypted_password))
-        conn.commit()
+        website = request.form.get('website')
+        login_email = request.form.get('login_email')
+        saved_password = request.form.get('saved_password')
+
+        if not website or not login_email or not saved_password:
+            flash("All fields are required.")
+        else:
+            encrypted_password = fernet.encrypt(saved_password.encode()).decode()
+            c.execute("INSERT INTO passwords (user_id, website, login_email, saved_password) VALUES (?, ?, ?, ?)",
+                      (user_id, website, login_email, encrypted_password))
+            conn.commit()
+            flash("Password saved successfully.")
 
     c.execute("SELECT website, login_email, saved_password FROM passwords WHERE user_id=?", (user_id,))
     rows = c.fetchall()
 
-    # Decrypt passwords
     saved_data = []
     for row in rows:
         decrypted_password = fernet.decrypt(row[2].encode()).decode()
-        saved_data.append((row[0], row[1], decrypted_password))
+        saved_data.append({
+            'website': row[0],
+            'email': row[1],
+            'password': decrypted_password
+        })
 
     return render_template('dashboard.html', saved_data=saved_data, email=session['email'])
 
